@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_app/data/question.dart';
+import 'package:quiz_app/answer_button.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class QuestionsScreen extends StatefulWidget {
-  const QuestionsScreen(this.chooseAnswer, {super.key});
+  const QuestionsScreen({
+    super.key,
+    required this.onSelectAnswer,
+  });
 
-  final void Function(String answers) chooseAnswer;
+  final void Function(String answer) onSelectAnswer;
 
   @override
   State<QuestionsScreen> createState() {
@@ -13,50 +18,47 @@ class QuestionsScreen extends StatefulWidget {
 }
 
 class _QuestionsScreenState extends State<QuestionsScreen> {
-  _QuestionsScreenState();
-  var currentIndex = 0;
+  var currentQuestionIndex = 0;
 
-  void answersQuestion(e) {
-    widget.chooseAnswer(e);
-    if (questions.length - 1 > currentIndex) {
-      setState(() {
-        currentIndex++;
-      });
-    }
+  void answerQuestion(String selectedAnswer) {
+    widget.onSelectAnswer(selectedAnswer);
+    // currentQuestionIndex = currentQuestionIndex + 1;
+    // currentQuestionIndex += 1;
+    setState(() {
+      currentQuestionIndex++; // increments the value by 1
+    });
   }
 
   @override
   Widget build(context) {
-    final currentQuestion = questions[currentIndex];
+    final currentQuestion = questions[currentQuestionIndex];
+
     return SizedBox(
       width: double.infinity,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        margin: const EdgeInsets.all(40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
               currentQuestion.text,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
+              style: GoogleFonts.lato(
+                color: const Color.fromARGB(255, 201, 153, 251),
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            ...currentQuestion.answers.map((e) => ElevatedButton(
-                  onPressed: () => answersQuestion(e),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 40),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                  ),
-                  child: Text(e),
-                )),
+            const SizedBox(height: 30),
+            ...currentQuestion.answers.map((answer) {
+              return AnswerButton(
+                answerText: answer,
+                onTap: () {
+                  answerQuestion(answer);
+                },
+              );
+            })
           ],
         ),
       ),
